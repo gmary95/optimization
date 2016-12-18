@@ -71,7 +71,6 @@ namespace optimization
                                 break;
                             }
                     default:
-                            accepted++;
                             break;
                 }
 
