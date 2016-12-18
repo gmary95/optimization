@@ -13,7 +13,8 @@ namespace optimization
 {
     public partial class Form1 : Form
     {
-        TSP tsp = new TSP();
+        TSP tsp;
+        List<Points> city = new List<Points>();
 
         public Form1()
         {
@@ -55,6 +56,14 @@ namespace optimization
 
         private void button2_Click(object sender, EventArgs e)
         {
+            if (tsp == null)
+            {
+                tsp = new TSP();
+                for (int i = 0; i < city.Count; i++)
+                {
+                    tsp.points.Add(city[i]);
+                }
+            }
             if (comboBox1.Text == "Hill Climbing")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
@@ -85,7 +94,7 @@ namespace optimization
 
         private void button1_Click(object sender, EventArgs e)
         {
-            button2.Enabled = true;
+            tsp = new TSP();
             Random rnd = new Random();
             for (int i = 0; i < 1000; i++)
             {
@@ -95,10 +104,37 @@ namespace optimization
                 tsp.points.Add(point);
             }
         }
+        private void DrawCityList(List<Points> cityList)
+        {
+            Image cityImage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Graphics graphics = Graphics.FromImage(cityImage);
+
+            foreach (Points city in cityList)
+            {
+                // Draw a circle for the city.
+                graphics.DrawEllipse(Pens.Black, (float)city.x - 2, (float)city.y - 2, 5, 5);
+            }
+
+            this.pictureBox1.Image = cityImage;
+        }
+
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (tsp != null)
+            {
+                //StatusLabel.Text = "Cannot alter city list while running";
+                //StatusLabel.ForeColor = Color.Red;
+                return;
+            }
+
+            city.Add(new Points(e.X, e.Y));
+            DrawCityList(city);
         }
     }
 }
