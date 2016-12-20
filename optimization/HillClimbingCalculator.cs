@@ -20,7 +20,8 @@ namespace optimization
         }
         public Transposition Calculate()
         {
-            Transposition x = new Transposition(tsp.points.Count);  
+            Transposition x = new Transposition(tsp.points.Count);
+            tsp.Draw(x);
             bool isFound = false;
 
             do
@@ -29,6 +30,7 @@ namespace optimization
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
                     Transposition y = x.CreateRandomTranspositionFromEps(eps, tsp.points.Count);
+                    tsp.Draw(y);
                     if (tsp.CalculateFunction(y) < tsp.CalculateFunction(x))
                     {
                         x = y;
@@ -36,7 +38,7 @@ namespace optimization
                     }
                 }         
             } while (!isFound);
-
+            tsp.Draw(x);
             return x;
         }
     }

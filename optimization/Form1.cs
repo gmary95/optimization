@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -64,11 +66,18 @@ namespace optimization
                     tsp.points.Add(city[i]);
                 }
             }
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(BeginTsp));
+            BeginTsp(null);
+           
+        }
+
+        void BeginTsp(Object stateInfo)
+        {
             if (comboBox1.Text == "Hill Climbing")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
                 int eps = Convert.ToInt32(numericUpDown2.Value);
-                
+
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts, eps);
@@ -91,17 +100,54 @@ namespace optimization
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
             }
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
-            tsp = new TSP();
-            Random rnd = new Random();
-            for (int i = 0; i < 1000; i++)
+            /* tsp = new TSP();
+             Random rnd = new Random();
+             for (int i = 0; i < 1000; i++)
+             {
+                 double x = rnd.Next();
+                 double y = rnd.Next();
+                 Points point = new Points(x, y);
+                 tsp.points.Add(point);
+             }*/
+            Stream myStream = null;
+
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                double x = rnd.Next();
-                double y = rnd.Next();
-                Points point = new Points(x, y);
-                tsp.points.Add(point);
+                try
+                {
+                    if ((myStream = openFileDialog1.OpenFile()) != null)
+                    {
+                        using (myStream)
+                        {
+                            ReadArray(openFileDialog1.FileName);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+        private void ReadArray(string path)
+        {
+            using (StreamReader sr = new StreamReader(path))
+            {
+                string[] lines = File.ReadAllLines(path);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string[] elem = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    elem[0] = elem[0].Replace('.', ',');
+                    elem[1] = elem[1].Replace('.', ',');
+                    Points point = new Points(Convert.ToDouble(elem[0]) + 2, Convert.ToDouble(elem[1]) + 2);
+                    city.Add(point);
+                }
+                DrawCityList(city);
             }
         }
         private void DrawCityList(List<Points> cityList)
@@ -111,7 +157,6 @@ namespace optimization
 
             foreach (Points city in cityList)
             {
-                // Draw a circle for the city.
                 graphics.DrawEllipse(Pens.Black, (float)city.x - 2, (float)city.y - 2, 5, 5);
             }
 
@@ -135,6 +180,23 @@ namespace optimization
 
             city.Add(new Points(e.X, e.Y));
             DrawCityList(city);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //if (tsp != null)
+            //{
+            //MessageBox.Show("Cannot alter city list while running");
+            //return;
+            //}
+            tsp = null;
+            city.Clear();
+            this.DrawCityList(city);
+        }
+
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+
         }
     }
 }

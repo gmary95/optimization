@@ -25,6 +25,7 @@ namespace optimization
         public Transposition Calculate()
         {
             Transposition x = new Transposition(tsp.points.Count);
+            tsp.Draw(x);
             double T = TryTemperature(1,x);
             int accepted = 0;
             int rejected = 0;
@@ -34,6 +35,7 @@ namespace optimization
             do
             {
                 Transposition y = x.CreateRandomTranspositionFromEps(eps, tsp.points.Count);
+                tsp.Draw(y);
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / T))
@@ -75,7 +77,7 @@ namespace optimization
                 }
 
             } while (!finished);
-
+            tsp.Draw(x);
             return x;
         }
 
