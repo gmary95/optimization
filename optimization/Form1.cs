@@ -81,7 +81,7 @@ namespace optimization
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts, eps);
-                Transposition transposition = hc.Calculate();
+                Tour transposition = hc.Calculate();
                 richTextBox1.Text += "Hill climbing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
@@ -96,7 +96,7 @@ namespace optimization
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(tsp, numberOfAttempts, eps, alph, exitCount);
-                Transposition transposition = simulatedAnnealing.Calculate();
+                Tour transposition = simulatedAnnealing.Calculate();
                 richTextBox1.Text += "Simulated annealing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
@@ -204,6 +204,29 @@ namespace optimization
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (tsp == null)
+            {
+                tsp = new TSP();
+                for (int i = 0; i < city.Count; i++)
+                {
+                    tsp.points.Add(city[i]);
+                }
+            }
+            Population pop = new Population(tsp, 500, true);
+            richTextBox1.Text += "Initial distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
+            GA genetic = new GA(tsp);
+            pop = genetic.EvolvePopulation(pop);
+            for (int i = 0; i < 100; i++)
+            {
+                pop = genetic.EvolvePopulation(pop);
+                richTextBox1.Text += "y = " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
+            }
+            richTextBox1.Text += "Final distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
+            tsp.Draw(pop.GetFittest());
         }
     }
 }

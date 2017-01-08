@@ -6,13 +6,22 @@ using System.Threading.Tasks;
 
 namespace optimization
 {
-    class Transposition
+    class Tour
     {
         public List<int> points;
+        static Random random = new Random();
 
-        public Transposition(int n)
+        public Tour(int n, int elem)
         {
-            Random random = new Random();
+            points = new List<int>();
+            for (int i = 0; i < n; i++)
+            {
+                points.Add(elem);
+            }
+        }
+
+        public Tour(int n)
+        {
             points = new List<int>();
             List<int> digit = new List<int>();
             for (int i = 0; i < n; i++)
@@ -30,15 +39,31 @@ namespace optimization
         public List<int> Swap(int from, int to)
         {
             List<int> newTransposition = new List<int>(points);
-            int tmp = newTransposition[to];
+            /*int tmp = newTransposition[to];
             newTransposition[to] = newTransposition[from];
-            newTransposition[from] = tmp;
+            newTransposition[from] = tmp;*/
+            int size = points.Count;
+            for (int c = 0; c <= from - 1; ++c)
+            {
+                newTransposition[c] = points[c];
+            }
+            int dec = 0;
+            for (int c = from; c <= to; ++c)
+            {
+                newTransposition[c] = points[to - dec];
+                dec++;
+            }
+            for (int c = to + 1; c < size; ++c)
+            {
+                newTransposition[c] = points[c];
+            }
             return newTransposition;
         }
-        public Transposition CreateRandomTranspositionFromEps()
+
+        public Tour CreateRandomTranspositionFromEps()
         {
             Random rnd = new Random();
-            Transposition y = new Transposition(points.Count);
+            Tour y = new Tour(points.Count);
             int x1 = 0, x2 = 0;
             while (x1 == x2)
             {

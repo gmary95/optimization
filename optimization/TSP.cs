@@ -13,7 +13,13 @@ namespace optimization
         public List<City> points = new List<City>();
         Image cityImage;
         Graphics cityGraphics;
-        public double CalculateFunction(Transposition x)
+
+        public City GetCity(int tourPosition)
+        {
+            return (City)points[tourPosition];
+        }
+
+        public double CalculateFunction(Tour x)
         {
             double f = 0;
             for (int i = 0; i < x.points.Count; i++)
@@ -29,7 +35,23 @@ namespace optimization
             }
             return f;
         }
-        public void Draw(Transposition x)
+
+        public bool containsCity(City city)
+        {
+            return points.Contains(city);
+        }
+
+        public String toString()
+        {
+            String geneString = "|";
+            for (int i = 0; i < points.Count; i++)
+            {
+                geneString += GetCity(i) + "|";
+            }
+            return geneString;
+        }
+
+        public void Draw(Tour x)
         {
             Form1 form = (Form1)Application.OpenForms[0];
             if (cityImage == null)
@@ -37,7 +59,7 @@ namespace optimization
                 cityImage = new Bitmap(form.pictureBox1.Width, form.pictureBox1.Height);
                 cityGraphics = Graphics.FromImage(cityImage);
             }
-     
+
             cityGraphics.FillRectangle(Brushes.White, 0, 0, cityImage.Width, cityImage.Height);
             foreach (City point in points)
             {
@@ -54,7 +76,7 @@ namespace optimization
                 {
                     cityGraphics.DrawLine(Pens.Black, (float)points[x.points[i]].x, (float)points[x.points[i]].y, (float)points[x.points[i + 1]].x, (float)points[x.points[i + 1]].y);
                 }
-            }    
+            }
 
             form.pictureBox1.Image = cityImage;
         }

@@ -22,9 +22,9 @@ namespace optimization
             this.exitConst = exitConst;
         }
 
-        public Transposition Calculate()
+        public Tour Calculate()
         {
-            Transposition x = new Transposition(tsp.points.Count);
+            Tour x = new Tour(tsp.points.Count);
             tsp.Draw(x);
             double T = TryTemperature(1,x);
             int accepted = 0;
@@ -34,7 +34,7 @@ namespace optimization
             bool finished = false;
             do
             {
-                Transposition y = x.CreateRandomTranspositionFromEps();
+                Tour y = x.CreateRandomTranspositionFromEps();
                 tsp.Draw(y);
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
@@ -99,14 +99,14 @@ namespace optimization
             return 0;
         }
 
-        private double TryTemperature(double t, Transposition x)
+        private double TryTemperature(double t, Tour x)
         {
             int acceptedCounter = 0;
             Random random = new Random();
 
             for (int i = 0; i < numberOfAttempts; i++)
             {
-                Transposition y = x.CreateRandomTranspositionFromEps(); 
+                Tour y = x.CreateRandomTranspositionFromEps(); 
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / t))

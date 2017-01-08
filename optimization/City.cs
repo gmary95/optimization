@@ -25,16 +25,7 @@ namespace optimization
             this.y = (random.NextDouble() * 200);
         }
 
-        public double distanceTo(City city)
-        {
-            double xDistance = Math.Abs(x - city.x);
-            double yDistance = Math.Abs(y - city.y);
-            double distance = Math.Sqrt((xDistance * xDistance) + (yDistance * yDistance));
-
-            return distance;
-        }
-
-        public String toString()
+        public string toString()
         {
             return x.ToString() + ", " + y.ToString();
         }

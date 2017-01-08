@@ -18,9 +18,9 @@ namespace optimization
             this.numberOfAttempts = numberOfAttempts;
             this.eps = eps;
         }
-        public Transposition Calculate()
+        public Tour Calculate()
         {
-            Transposition x = new Transposition(tsp.points.Count);
+            Tour x = new Tour(tsp.points.Count);
             tsp.Draw(x);
             bool isFound = false;
 
@@ -29,8 +29,7 @@ namespace optimization
                 isFound = false;
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
-                    Transposition y = x.CreateRandomTranspositionFromEps();
-                    tsp.Draw(y);
+                    Tour y = x.CreateRandomTranspositionFromEps();
                     if (tsp.CalculateFunction(y) < tsp.CalculateFunction(x))
                     {
                         x = y;
@@ -38,7 +37,6 @@ namespace optimization
                     }
                 }         
             } while (!isFound);
-            tsp.Draw(x);
             return x;
         }
     }
