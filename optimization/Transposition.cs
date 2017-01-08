@@ -35,19 +35,17 @@ namespace optimization
             newTransposition[from] = tmp;
             return newTransposition;
         }
-        public Transposition CreateRandomTranspositionFromEps(int eps, int count)
+        public Transposition CreateRandomTranspositionFromEps()
         {
             Random rnd = new Random();
             Transposition y = new Transposition(points.Count);
-            for (int j = 0; j < eps; j++)
+            int x1 = 0, x2 = 0;
+            while (x1 == x2)
             {
-                int from = rnd.Next(count);
-                int to = rnd.Next(count);
-                if (from != to)
-                {
-                    y.points = Swap(from, to);
-                }
+                x1 = (int)(points.Count * rnd.NextDouble());
+                x2 = (int)(points.Count * rnd.NextDouble());
             }
+            y.points = Swap(x1, x2);
             return y;
         }
     }

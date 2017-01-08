@@ -10,15 +10,22 @@ namespace optimization
 {
     class TSP
     {
-        public List<Points> points = new List<Points>();
+        public List<City> points = new List<City>();
         Image cityImage;
         Graphics cityGraphics;
         public double CalculateFunction(Transposition x)
         {
             double f = 0;
-            for (int i = 0; i < x.points.Count - 1; i++)
+            for (int i = 0; i < x.points.Count; i++)
             {
-                f += Math.Sqrt(Math.Pow(points[x.points[i]].x - points[x.points[i + 1]].x, 2) * Math.Pow(points[x.points[i]].y - points[x.points[i + 1]].y, 2));
+                if (i == x.points.Count - 1)
+                {
+                    f += Math.Sqrt(Math.Pow(points[x.points[i]].x - points[x.points[0]].x, 2) * Math.Pow(points[x.points[i]].y - points[x.points[0]].y, 2));
+                }
+                else
+                {
+                    f += Math.Sqrt(Math.Pow(points[x.points[i]].x - points[x.points[i + 1]].x, 2) * Math.Pow(points[x.points[i]].y - points[x.points[i + 1]].y, 2));
+                }
             }
             return f;
         }
@@ -32,7 +39,7 @@ namespace optimization
             }
      
             cityGraphics.FillRectangle(Brushes.White, 0, 0, cityImage.Width, cityImage.Height);
-            foreach (Points point in points)
+            foreach (City point in points)
             {
                 // Draw a circle for the city.
                 cityGraphics.DrawEllipse(Pens.Black, (float)point.x - 2, (float)point.y - 2, 5, 5);

@@ -34,7 +34,7 @@ namespace optimization
             bool finished = false;
             do
             {
-                Transposition y = x.CreateRandomTranspositionFromEps(eps, tsp.points.Count);
+                Transposition y = x.CreateRandomTranspositionFromEps();
                 tsp.Draw(y);
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
@@ -106,7 +106,7 @@ namespace optimization
 
             for (int i = 0; i < numberOfAttempts; i++)
             {
-                Transposition y = x.CreateRandomTranspositionFromEps(eps, tsp.points.Count); 
+                Transposition y = x.CreateRandomTranspositionFromEps(); 
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / t))

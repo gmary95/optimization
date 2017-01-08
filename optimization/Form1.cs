@@ -16,7 +16,7 @@ namespace optimization
     public partial class Form1 : Form
     {
         TSP tsp;
-        List<Points> city = new List<Points>();
+        List<City> city = new List<City>();
 
         public Form1()
         {
@@ -82,6 +82,7 @@ namespace optimization
                 stopwatch.Start();
                 HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts, eps);
                 Transposition transposition = hc.Calculate();
+                richTextBox1.Text += "Hill climbing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
             }
@@ -96,6 +97,7 @@ namespace optimization
                 stopwatch.Start();
                 SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(tsp, numberOfAttempts, eps, alph, exitCount);
                 Transposition transposition = simulatedAnnealing.Calculate();
+                richTextBox1.Text += "Simulated annealing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
             }
@@ -111,6 +113,9 @@ namespace optimization
                  Points point = new Points(x, y);
                  tsp.points.Add(point);
              }*/
+            tsp = null;
+            city.Clear();
+            this.DrawCityList(city);
             Stream myStream = null;
 
             openFileDialog1.FilterIndex = 2;
@@ -125,6 +130,7 @@ namespace optimization
                         using (myStream)
                         {
                             ReadArray(openFileDialog1.FileName);
+                            richTextBox1.Text = "";
                         }
                     }
                 }
@@ -142,20 +148,20 @@ namespace optimization
                 for (int i = 0; i < lines.Length; i++)
                 {
                     string[] elem = lines[i].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    elem[0] = elem[0].Replace('.', ',');
                     elem[1] = elem[1].Replace('.', ',');
-                    Points point = new Points(Convert.ToDouble(elem[0]) + 2, Convert.ToDouble(elem[1]) + 2);
+                    elem[2] = elem[2].Replace('.', ',');
+                    City point = new City(Convert.ToDouble(elem[1]), Convert.ToDouble(elem[2]));
                     city.Add(point);
                 }
                 DrawCityList(city);
             }
         }
-        private void DrawCityList(List<Points> cityList)
+        private void DrawCityList(List<City> cityList)
         {
             Image cityImage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics graphics = Graphics.FromImage(cityImage);
 
-            foreach (Points city in cityList)
+            foreach (City city in cityList)
             {
                 graphics.DrawEllipse(Pens.Black, (float)city.x - 2, (float)city.y - 2, 5, 5);
             }
@@ -178,8 +184,9 @@ namespace optimization
                 return;
             }
 
-            city.Add(new Points(e.X, e.Y));
+            city.Add(new City(e.X, e.Y));
             DrawCityList(city);
+            richTextBox1.Text = "";
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -191,7 +198,7 @@ namespace optimization
             //}
             tsp = null;
             city.Clear();
-            this.DrawCityList(city);
+            DrawCityList(city);
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)

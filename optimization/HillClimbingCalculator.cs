@@ -29,7 +29,7 @@ namespace optimization
                 isFound = false;
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
-                    Transposition y = x.CreateRandomTranspositionFromEps(eps, tsp.points.Count);
+                    Transposition y = x.CreateRandomTranspositionFromEps();
                     tsp.Draw(y);
                     if (tsp.CalculateFunction(y) < tsp.CalculateFunction(x))
                     {
