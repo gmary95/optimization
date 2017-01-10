@@ -12,6 +12,7 @@ namespace optimization
         int numberOfAttempts;
         int eps, exitConst;
         double alpha;
+        public List<Tour> bestTours;
 
         public SimulatedAnnealing(TSP tsp, int numberOfAttempts, int eps, double alpha, int exitConst)
         {
@@ -20,12 +21,13 @@ namespace optimization
             this.eps = eps;
             this.alpha = alpha;
             this.exitConst = exitConst;
+            bestTours = new List<Tour>();
         }
 
         public Tour Calculate()
         {
             Tour x = new Tour(tsp.points.Count);
-            tsp.Draw(x);
+            bestTours.Add(x);
             double T = TryTemperature(1,x);
             int accepted = 0;
             int rejected = 0;
@@ -35,12 +37,12 @@ namespace optimization
             do
             {
                 Tour y = x.CreateRandomTranspositionFromEps(eps);
-                tsp.Draw(y);
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / T))
                 {
                     x = y;
+                    bestTours.Add(x);
                     accepted++;
                 }
                 else

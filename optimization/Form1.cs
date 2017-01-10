@@ -16,6 +16,7 @@ namespace optimization
     public partial class Form1 : Form
     {
         TSP tsp;
+        List<Tour> sameAnswer;
         List<City> city = new List<City>();
 
         public Form1()
@@ -73,6 +74,8 @@ namespace optimization
 
         void BeginTsp(Object stateInfo)
         {
+            sameAnswer = new List<Tour>();
+            comboBox2.Items.Clear();
             if (comboBox1.Text == "Hill Climbing")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
@@ -82,6 +85,7 @@ namespace optimization
                 stopwatch.Start();
                 HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts, eps);
                 Tour transposition = hc.Calculate();
+                sameAnswer = hc.bestTours;
                 richTextBox1.Text += "Hill climbing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
@@ -97,9 +101,17 @@ namespace optimization
                 stopwatch.Start();
                 SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(tsp, numberOfAttempts, eps, alph, exitCount);
                 Tour transposition = simulatedAnnealing.Calculate();
+                sameAnswer = simulatedAnnealing.bestTours;
                 richTextBox1.Text += "Simulated annealing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
+            }
+            if (sameAnswer.Count != 0)
+            {
+                for (int i = 0; i < sameAnswer.Count; i++)
+                {
+                    comboBox2.Items.Add(i);
+                }
             }
         }
         private void button1_Click(object sender, EventArgs e)
@@ -179,8 +191,6 @@ namespace optimization
         {
             if (tsp != null)
             {
-                //StatusLabel.Text = "Cannot alter city list while running";
-                //StatusLabel.ForeColor = Color.Red;
                 return;
             }
 
@@ -191,11 +201,6 @@ namespace optimization
 
         private void button3_Click(object sender, EventArgs e)
         {
-            //if (tsp != null)
-            //{
-            //MessageBox.Show("Cannot alter city list while running");
-            //return;
-            //}
             tsp = null;
             city.Clear();
             DrawCityList(city);
@@ -227,6 +232,12 @@ namespace optimization
             }
             richTextBox1.Text += "Final distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
             tsp.Draw(pop.GetFittest());
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tsp.Draw(sameAnswer[comboBox2.SelectedIndex]);
+            label8.Text = tsp.CalculateFunction(sameAnswer[comboBox2.SelectedIndex]).ToString();
         }
     }
 }

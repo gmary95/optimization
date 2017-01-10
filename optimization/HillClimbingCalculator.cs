@@ -11,16 +11,19 @@ namespace optimization
         TSP tsp;
         int numberOfAttempts;
         int eps;
+        public List<Tour> bestTours;
 
         public HillClimbingCalculator(TSP tsp, int numberOfAttempts, int eps)
         {
             this.tsp = tsp;
             this.numberOfAttempts = numberOfAttempts;
             this.eps = eps;
+            bestTours = new List<Tour>();
         }
         public Tour Calculate()
         {
             Tour x = new Tour(tsp.points.Count);
+            bestTours.Add(x);
             bool isFound = false;
             do
             {
@@ -31,6 +34,7 @@ namespace optimization
                     if (tsp.CalculateFunction(y) < tsp.CalculateFunction(x))
                     {
                         x = y;
+                        bestTours.Add(x);
                         isFound = true;
                         break;
                     }
