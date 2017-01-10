@@ -101,5 +101,62 @@ namespace optimization
             Tour fittest = tournament.GetFittest();
             return fittest;
         }
+
+        private Dictionary<int, NeighboardCityes> createEdgeRecombinationMatrix (Tour parent1, Tour parent2)
+        {
+            Dictionary<int, NeighboardCityes> edgeRecombinationMatrix = new Dictionary<int, NeighboardCityes>();
+            for (int i = 0; i < parent1.points.Count; i++)
+            {
+                if (i == parent1.points.Count)
+                {
+                    NeighboardCityes cities = new NeighboardCityes();
+                    cities.neignboardCity.Add(new NeighboardCity(parent1.points[i - 1], cities.isContains(parent1.points[i -1])));
+                    cities.neignboardCity.Add(new NeighboardCity(parent1.points[0], cities.isContains(parent1.points[0])));
+                    edgeRecombinationMatrix.Add(parent1.points[i], cities);
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        NeighboardCityes cities = new NeighboardCityes();
+                        cities.neignboardCity.Add(new NeighboardCity(parent1.points[parent1.points.Count - 1], cities.isContains(parent1.points[i - 1])));
+                        cities.neignboardCity.Add(new NeighboardCity(parent1.points[i + 1], cities.isContains(parent1.points[0])));
+                        edgeRecombinationMatrix.Add(parent1.points[i], cities);
+                    }
+                    else
+                    {
+                        NeighboardCityes cities = new NeighboardCityes();
+                        cities.neignboardCity.Add(new NeighboardCity(parent1.points[i - 1], cities.isContains(parent1.points[i - 1])));
+                        cities.neignboardCity.Add(new NeighboardCity(parent1.points[i + 1], cities.isContains(parent1.points[0])));
+                        edgeRecombinationMatrix.Add(parent1.points[i], cities);
+                    }
+                }
+            }
+            for (int i = 0; i < parent2.points.Count; i++)
+            {
+                if (i == parent2.points.Count)
+                {
+                    NeighboardCityes cities = new NeighboardCityes();
+                    edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i - 1], cities.isContains(parent2.points[i - 1])));
+                    edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[0], cities.isContains(parent2.points[0])));
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        NeighboardCityes cities = new NeighboardCityes();
+                        edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[parent2.points.Count - 1], cities.isContains(parent2.points[i - 1])));
+                        edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i + 1], cities.isContains(parent2.points[0])));
+                    }
+                    else
+                    {
+                        NeighboardCityes cities = new NeighboardCityes();
+                        edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i + 1], cities.isContains(parent2.points[0])));
+                        edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i - 1], cities.isContains(parent2.points[i - 1])));
+                    }
+                }
+            }
+            return edgeRecombinationMatrix;
+        }
     }
 }

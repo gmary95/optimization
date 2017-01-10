@@ -22,6 +22,8 @@ namespace optimization
         public Form1()
         {
             InitializeComponent();
+            label5.Text = "";
+            label8.Text = "";
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -52,8 +54,18 @@ namespace optimization
             {
                 label6.Visible = true;
                 label7.Visible = true;
+                label7.Text = "Number For Exit";
                 numericUpDown4.Visible = true;
                 textBox1.Visible = true;
+            }
+            if (comboBox1.Text == "Genetic Algorithm")
+            {
+                label6.Visible = false;
+                label7.Visible = true;
+                label7.Text = "Population Size";
+                numericUpDown4.Visible = true;
+                textBox1.Visible = false;
+
             }
         }
 
@@ -69,7 +81,6 @@ namespace optimization
             }
             //ThreadPool.QueueUserWorkItem(new WaitCallback(BeginTsp));
             BeginTsp(null);
-           
         }
 
         void BeginTsp(Object stateInfo)
@@ -106,6 +117,32 @@ namespace optimization
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
             }
+            if (comboBox1.Text == "Genetic Algorithm")
+            {
+                int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
+                int eps = Convert.ToInt32(numericUpDown2.Value);
+                int populationSize = Convert.ToInt32(numericUpDown4.Value);
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                Population pop = new Population(tsp, populationSize, true);
+                Tour bestTour = pop.GetFittest();
+                double fitness = tsp.CalculateFunction(bestTour);
+                richTextBox1.Text += "Genetic algorithm solution:\nInitial distance: " + fitness + "\n";
+                sameAnswer.Add(pop.GetFittest());
+                GA genetic = new GA(tsp, eps);
+                for (int i = 0; i < numberOfAttempts; i++)
+                {
+                    pop = genetic.EvolvePopulation(pop);
+                    bestTour = pop.GetFittest();
+                    sameAnswer.Add(bestTour);
+                    richTextBox1.Text += "y = " + tsp.CalculateFunction(bestTour) + "\n";
+                }
+                richTextBox1.Text += "Final distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
+                tsp.Draw(pop.GetFittest());
+                stopwatch.Stop();
+                label5.Text = stopwatch.ElapsedMilliseconds.ToString();
+            }
             if (sameAnswer.Count != 0)
             {
                 for (int i = 0; i < sameAnswer.Count; i++)
@@ -116,15 +153,6 @@ namespace optimization
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            /* tsp = new TSP();
-             Random rnd = new Random();
-             for (int i = 0; i < 1000; i++)
-             {
-                 double x = rnd.Next();
-                 double y = rnd.Next();
-                 Points point = new Points(x, y);
-                 tsp.points.Add(point);
-             }*/
             tsp = null;
             city.Clear();
             this.DrawCityList(city);
@@ -187,6 +215,13 @@ namespace optimization
             this.pictureBox1.Image = cityImage;
         }
 
+        private List<City> ScaleAndMove(List<City> cityList)
+        {
+            List<City> newCityList = new List<City>(cityList);
+
+            return newCityList;
+        }
+
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
@@ -219,32 +254,36 @@ namespace optimization
 
         private void button4_Click(object sender, EventArgs e)
         {
-            if (tsp == null)
-            {
-                tsp = new TSP();
-                for (int i = 0; i < city.Count; i++)
-                {
-                    tsp.points.Add(city[i]);
-                }
-            }
-            int eps = Convert.ToInt32(numericUpDown2.Value);
-            Population pop = new Population(tsp, 100, true);
-            richTextBox1.Text += "Initial distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
-            GA genetic = new GA(tsp, eps);
-            //pop = genetic.EvolvePopulation(pop);
-            for (int i = 0; i < 100; i++)
-            {
-                pop = genetic.EvolvePopulation(pop);
-                richTextBox1.Text += "y = " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
-            }
-            richTextBox1.Text += "Final distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
-            tsp.Draw(pop.GetFittest());
+
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             tsp.Draw(sameAnswer[comboBox2.SelectedIndex]);
             label8.Text = tsp.CalculateFunction(sameAnswer[comboBox2.SelectedIndex]).ToString();
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != ','))
+            {
+                e.Handled = true;
+            }
+
+            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numericUpDown4_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

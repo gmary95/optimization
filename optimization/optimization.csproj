@@ -59,6 +59,8 @@
     <Compile Include="GA.cs" />
     <Compile Include="HillClimbingCalculator.cs" />
     <Compile Include="City.cs" />
+    <Compile Include="NeighboardCity.cs" />
+    <Compile Include="NeighboardCityes.cs" />
     <Compile Include="Population.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
