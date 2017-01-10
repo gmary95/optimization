@@ -34,7 +34,7 @@ namespace optimization
             bool finished = false;
             do
             {
-                Tour y = x.CreateRandomTranspositionFromEps();
+                Tour y = x.CreateRandomTranspositionFromEps(eps);
                 tsp.Draw(y);
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
@@ -106,7 +106,7 @@ namespace optimization
 
             for (int i = 0; i < numberOfAttempts; i++)
             {
-                Tour y = x.CreateRandomTranspositionFromEps(); 
+                Tour y = x.CreateRandomTranspositionFromEps(eps); 
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / t))

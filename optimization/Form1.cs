@@ -216,10 +216,10 @@ namespace optimization
                     tsp.points.Add(city[i]);
                 }
             }
-            Population pop = new Population(tsp, 500, true);
+            Population pop = new Population(tsp, 100, true);
             richTextBox1.Text += "Initial distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
             GA genetic = new GA(tsp);
-            pop = genetic.EvolvePopulation(pop);
+            //pop = genetic.EvolvePopulation(pop);
             for (int i = 0; i < 100; i++)
             {
                 pop = genetic.EvolvePopulation(pop);

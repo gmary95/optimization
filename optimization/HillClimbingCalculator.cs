@@ -21,22 +21,22 @@ namespace optimization
         public Tour Calculate()
         {
             Tour x = new Tour(tsp.points.Count);
-            tsp.Draw(x);
             bool isFound = false;
-
             do
             {
                 isFound = false;
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
-                    Tour y = x.CreateRandomTranspositionFromEps();
+                    Tour y = x.CreateRandomTranspositionFromEps(eps);
                     if (tsp.CalculateFunction(y) < tsp.CalculateFunction(x))
                     {
                         x = y;
                         isFound = true;
+                        break;
                     }
-                }         
-            } while (!isFound);
+                }
+            } while (isFound);
+            tsp.Draw(x);
             return x;
         }
     }

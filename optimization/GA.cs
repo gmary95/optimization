@@ -8,7 +8,7 @@ namespace optimization
 {
     class GA
     {
-        private double mutationRate = 0.9;
+        private double mutationRate = 0.05;
         private int tournamentSize = 4;
 
         TSP tsp;
@@ -87,7 +87,7 @@ namespace optimization
                 if (random.NextDouble() < mutationRate)
                 {
                     int tourPos2 = (int)(tour.points.Count * random.NextDouble());
-                    tour.Swap(tourPos1, tourPos2);
+                    tour.points = tour.Swap(tourPos1, tourPos2);
                 }
             }
         }

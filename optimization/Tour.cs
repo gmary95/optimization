@@ -60,17 +60,21 @@ namespace optimization
             return newTransposition;
         }
 
-        public Tour CreateRandomTranspositionFromEps()
+        public Tour CreateRandomTranspositionFromEps(int eps)
         {
-            Random rnd = new Random();
             Tour y = new Tour(points.Count);
             int x1 = 0, x2 = 0;
             while (x1 == x2)
             {
-                x1 = (int)(points.Count * rnd.NextDouble());
-                x2 = (int)(points.Count * rnd.NextDouble());
+                x1 = (int)(points.Count * random.NextDouble());
+                x2 = (int)(points.Count * random.NextDouble());
             }
-            y.points = Swap(x1, x2);
+            int count = 0;
+            count = (int)(eps * random.NextDouble());
+            for (int i = 0; i < count; i++)
+            {
+                y.points = Swap(x1, x2);
+            }
             return y;
         }
     }
