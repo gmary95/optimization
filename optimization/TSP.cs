@@ -61,9 +61,11 @@ namespace optimization
             }
 
             cityGraphics.FillRectangle(Brushes.White, 0, 0, cityImage.Width, cityImage.Height);
+            int k = 0;
             foreach (City point in points)
             {
-                // Draw a circle for the city.
+                k++;
+                cityGraphics.DrawString(k.ToString(), new Font("Tahoma", 8), Brushes.Black, (float)point.x, (float)point.y);
                 cityGraphics.DrawEllipse(Pens.Black, (float)point.x - 2, (float)point.y - 2, 5, 5);
             }
             for (int i = 0; i < x.points.Count; i++)

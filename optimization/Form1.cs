@@ -173,8 +173,11 @@ namespace optimization
             Image cityImage = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics graphics = Graphics.FromImage(cityImage);
 
+            int k = 0;
             foreach (City city in cityList)
             {
+                k++;
+                graphics.DrawString(k.ToString(), new Font("Tahoma", 8), Brushes.Black, (float)city.x, (float)city.y);
                 graphics.DrawEllipse(Pens.Black, (float)city.x - 2, (float)city.y - 2, 5, 5);
             }
 
