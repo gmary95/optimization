@@ -176,8 +176,11 @@ namespace optimization
             int k = 0;
             foreach (City city in cityList)
             {
-                k++;
-                graphics.DrawString(k.ToString(), new Font("Tahoma", 8), Brushes.Black, (float)city.x, (float)city.y);
+                if (cityList.Count < 50)
+                {
+                    k++;
+                    graphics.DrawString(k.ToString(), new Font("Tahoma", 8), Brushes.Black, (float)city.x, (float)city.y);
+                }
                 graphics.DrawEllipse(Pens.Black, (float)city.x - 2, (float)city.y - 2, 5, 5);
             }
 
@@ -224,9 +227,10 @@ namespace optimization
                     tsp.points.Add(city[i]);
                 }
             }
+            int eps = Convert.ToInt32(numericUpDown2.Value);
             Population pop = new Population(tsp, 100, true);
             richTextBox1.Text += "Initial distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
-            GA genetic = new GA(tsp);
+            GA genetic = new GA(tsp, eps);
             //pop = genetic.EvolvePopulation(pop);
             for (int i = 0; i < 100; i++)
             {

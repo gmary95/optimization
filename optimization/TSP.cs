@@ -64,8 +64,11 @@ namespace optimization
             int k = 0;
             foreach (City point in points)
             {
-                k++;
-                cityGraphics.DrawString(k.ToString(), new Font("Tahoma", 8), Brushes.Black, (float)point.x, (float)point.y);
+                if (points.Count < 50)
+                {
+                    k++;
+                    cityGraphics.DrawString(k.ToString(), new Font("Tahoma", 8), Brushes.Black, (float)point.x, (float)point.y);
+                }
                 cityGraphics.DrawEllipse(Pens.Black, (float)point.x - 2, (float)point.y - 2, 5, 5);
             }
             for (int i = 0; i < x.points.Count; i++)
