@@ -10,14 +10,12 @@ namespace optimization
     {
         TSP tsp;
         int numberOfAttempts;
-        int eps;
         public List<Tour> bestTours;
 
-        public HillClimbingCalculator(TSP tsp, int numberOfAttempts, int eps)
+        public HillClimbingCalculator(TSP tsp, int numberOfAttempts)
         {
             this.tsp = tsp;
             this.numberOfAttempts = numberOfAttempts;
-            this.eps = eps;
             bestTours = new List<Tour>();
         }
         public Tour Calculate()
@@ -30,7 +28,7 @@ namespace optimization
                 isFound = false;
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
-                    Tour y = x.CreateRandomTranspositionFromEps(eps);
+                    Tour y = x.CreateRandomTranspositionFromEps();
                     if (tsp.CalculateFunction(y) < tsp.CalculateFunction(x))
                     {
                         x = y;

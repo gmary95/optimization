@@ -12,13 +12,11 @@ namespace optimization
         private int tournamentSize = 4;
 
         TSP tsp;
-        int eps;
         static Random random = new Random();
 
-        public GA(TSP tsp, int eps)
+        public GA(TSP tsp)
         {
             this.tsp = tsp;
-            this.eps = eps;
         }
 
         public Population EvolvePopulation(Population population)
@@ -86,7 +84,7 @@ namespace optimization
         {
             if (random.NextDouble() < mutationRate)
             {
-                tour = tour.CreateRandomTranspositionFromEps(eps);
+                tour = tour.CreateRandomTranspositionFromEps();
             }
         }
 

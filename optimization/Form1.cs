@@ -79,6 +79,20 @@ namespace optimization
                     tsp.points.Add(city[i]);
                 }
             }
+            tsp.InitDistanceMatrix();
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.EnableResizing; 
+            dataGridView1.ColumnCount = tsp.points.Count;
+            dataGridView1.RowCount = tsp.points.Count;
+            for (int i = 0; i < tsp.points.Count; i++)
+            {
+                dataGridView1.Rows[i].HeaderCell.Value = (i + 1).ToString();
+                for (int j = 0; j < tsp.points.Count; j++)
+                {
+                    dataGridView1.Columns[j].HeaderCell.Value = (j + 1).ToString();
+                    dataGridView1.Rows[i].Cells[j].Value = tsp.distanceMatrix[i, j];
+                }
+            }
             //ThreadPool.QueueUserWorkItem(new WaitCallback(BeginTsp));
             BeginTsp(null);
         }
@@ -90,11 +104,10 @@ namespace optimization
             if (comboBox1.Text == "Hill Climbing")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
-                int eps = Convert.ToInt32(numericUpDown2.Value);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts, eps);
+                HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts);
                 Tour transposition = hc.Calculate();
                 sameAnswer = hc.bestTours;
                 richTextBox1.Text += "Hill climbing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
@@ -104,13 +117,12 @@ namespace optimization
             if (comboBox1.Text == "Simulated Annealing")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
-                int eps = Convert.ToInt32(numericUpDown2.Value);
                 int exitCount = Convert.ToInt32(numericUpDown4.Value);
                 double alph = Convert.ToDouble(textBox1.Text);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(tsp, numberOfAttempts, eps, alph, exitCount);
+                SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(tsp, numberOfAttempts, alph, exitCount);
                 Tour transposition = simulatedAnnealing.Calculate();
                 sameAnswer = simulatedAnnealing.bestTours;
                 richTextBox1.Text += "Simulated annealing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
@@ -120,7 +132,6 @@ namespace optimization
             if (comboBox1.Text == "Genetic Algorithm")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
-                int eps = Convert.ToInt32(numericUpDown2.Value);
                 int populationSize = Convert.ToInt32(numericUpDown4.Value);
 
                 Stopwatch stopwatch = new Stopwatch();
@@ -130,7 +141,7 @@ namespace optimization
                 double fitness = tsp.CalculateFunction(bestTour);
                 richTextBox1.Text += "Genetic algorithm solution:\nInitial distance: " + fitness + "\n";
                 sameAnswer.Add(pop.GetFittest());
-                GA genetic = new GA(tsp, eps);
+                GA genetic = new GA(tsp);
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
                     pop = genetic.EvolvePopulation(pop);
@@ -156,6 +167,8 @@ namespace optimization
             tsp = null;
             city.Clear();
             this.DrawCityList(city);
+            dataGridView1.Columns.Clear();
+            dataGridView1.Rows.Clear();
             Stream myStream = null;
 
             openFileDialog1.FilterIndex = 2;
@@ -245,6 +258,8 @@ namespace optimization
             tsp = null;
             city.Clear();
             DrawCityList(city);
+            dataGridView1.Columns.Clear();
+            dataGridView1.Rows.Clear();
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)

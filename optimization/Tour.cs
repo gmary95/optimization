@@ -42,13 +42,19 @@ namespace optimization
             /*int tmp = newTransposition[to];
             newTransposition[to] = newTransposition[from];
             newTransposition[from] = tmp;*/
+            if (from > to)
+            {
+                int tmp = from;
+                from = to;
+                to = tmp;
+            }
             int size = points.Count;
-            for (int c = 0; c <= from - 1; ++c)
+            for (int c = 0; c <= from; ++c)
             {
                 newTransposition[c] = points[c];
             }
             int dec = 0;
-            for (int c = from; c <= to; ++c)
+            for (int c = from + 1; c <= to; ++c)
             {
                 newTransposition[c] = points[to - dec];
                 dec++;
@@ -60,7 +66,7 @@ namespace optimization
             return newTransposition;
         }
 
-        public Tour CreateRandomTranspositionFromEps(int eps)
+        public Tour CreateRandomTranspositionFromEps()
         {
             Tour y = new Tour(points.Count);
             int x1 = 0, x2 = 0;
@@ -69,12 +75,7 @@ namespace optimization
                 x1 = (int)(points.Count * random.NextDouble());
                 x2 = (int)(points.Count * random.NextDouble());
             }
-            int count = 0;
-            count = (int)(eps * random.NextDouble());
-            for (int i = 0; i < count; i++)
-            {
-                y.points = Swap(x1, x2);
-            }
+            y.points = Swap(x1, x2);
             return y;
         }
     }

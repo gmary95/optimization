@@ -10,15 +10,15 @@ namespace optimization
     {
         TSP tsp;
         int numberOfAttempts;
-        int eps, exitConst;
+        int exitConst;
         double alpha;
         public List<Tour> bestTours;
+        static Random random = new Random();
 
-        public SimulatedAnnealing(TSP tsp, int numberOfAttempts, int eps, double alpha, int exitConst)
+        public SimulatedAnnealing(TSP tsp, int numberOfAttempts, double alpha, int exitConst)
         {
             this.tsp = tsp;
             this.numberOfAttempts = numberOfAttempts;
-            this.eps = eps;
             this.alpha = alpha;
             this.exitConst = exitConst;
             bestTours = new List<Tour>();
@@ -32,11 +32,10 @@ namespace optimization
             int accepted = 0;
             int rejected = 0;
             int rejQuasInRaw = 0;
-            Random random = new Random();
             bool finished = false;
             do
             {
-                Tour y = x.CreateRandomTranspositionFromEps(eps);
+                Tour y = x.CreateRandomTranspositionFromEps();
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / T))
@@ -90,11 +89,12 @@ namespace optimization
 
         private int QuasiEquilibriumReached(long acceptedCounter, long rejectedCounter)
         {
-            if (acceptedCounter == eps)
+            double nEps = 1;//(tsp.points.Count * (tsp.points.Count - 1)) / 2;
+            if (acceptedCounter == nEps)
             {
                 return 1;
             }
-            if (rejectedCounter == 2 * eps)
+            if (rejectedCounter == 2 * nEps)
             {
                 return -1;
             }
@@ -104,11 +104,10 @@ namespace optimization
         private double TryTemperature(double t, Tour x)
         {
             int acceptedCounter = 0;
-            Random random = new Random();
 
             for (int i = 0; i < numberOfAttempts; i++)
             {
-                Tour y = x.CreateRandomTranspositionFromEps(eps); 
+                Tour y = x.CreateRandomTranspositionFromEps(); 
                 double dF = tsp.CalculateFunction(y) - tsp.CalculateFunction(x);
 
                 if (random.NextDouble() < Math.Exp(-dF / t))
@@ -124,11 +123,11 @@ namespace optimization
 
                 if (rate < 0.945)
                 {
-                    t = (1 - alpha) / t;
+                    t = t / (1 - alpha);
                 }
                 else
                 {
-                    t = (1 - alpha) * t;
+                    t = t * (1 - alpha);
                 }
             }
 

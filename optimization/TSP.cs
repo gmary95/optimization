@@ -13,7 +13,19 @@ namespace optimization
         public List<City> points = new List<City>();
         Image cityImage;
         Graphics cityGraphics;
+        public double[,] distanceMatrix;
 
+        public void InitDistanceMatrix()
+        {
+            distanceMatrix = new double[points.Count, points.Count];
+            for (int i = 0; i < points.Count; i++)
+            {
+                for (int j = 0; j < points.Count; j++)
+                {
+                    distanceMatrix[i,j] = Math.Sqrt(Math.Pow(points[i].x - points[j].x, 2) * Math.Pow(points[i].y - points[j].y, 2));
+                }
+            }
+        }
         public City GetCity(int tourPosition)
         {
             return (City)points[tourPosition];
@@ -26,11 +38,11 @@ namespace optimization
             {
                 if (i == x.points.Count - 1)
                 {
-                    f += Math.Sqrt(Math.Pow(points[x.points[i]].x - points[x.points[0]].x, 2) * Math.Pow(points[x.points[i]].y - points[x.points[0]].y, 2));
+                    f += distanceMatrix[x.points[i], x.points[0]];
                 }
                 else
                 {
-                    f += Math.Sqrt(Math.Pow(points[x.points[i]].x - points[x.points[i + 1]].x, 2) * Math.Pow(points[x.points[i]].y - points[x.points[i + 1]].y, 2));
+                    f += distanceMatrix[x.points[i], x.points[i + 1]];
                 }
             }
             return f;
