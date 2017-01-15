@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace optimization
 {
@@ -14,6 +16,8 @@ namespace optimization
         double alpha;
         public List<Tour> bestTours;
         static Random random = new Random();
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        private static extern bool AllocConsole();
 
         public SimulatedAnnealing(TSP tsp, int numberOfAttempts, double alpha, int exitConst)
         {
@@ -22,13 +26,19 @@ namespace optimization
             this.alpha = alpha;
             this.exitConst = exitConst;
             bestTours = new List<Tour>();
+            //AllocConsole();
         }
 
         public Tour Calculate()
         {
+            Form1 form = (Form1)Application.OpenForms[0];
+            Chart chart1 = form.chart1;
+            chart1.Series.Clear();
+            chart1.Series.Add("line");
+            chart1.Series[0].ChartType = SeriesChartType.FastLine;
             Tour x = new Tour(tsp.points.Count);
-            bestTours.Add(x);
-            double T = TryTemperature(1,x);
+            //bestTours.Add(x);
+            double T = 1000;// TryTemperature(1,x);
             int accepted = 0;
             int rejected = 0;
             int rejQuasInRaw = 0;
@@ -41,7 +51,15 @@ namespace optimization
                 if (random.NextDouble() < Math.Exp(-dF / T))
                 {
                     x = y;
-                    bestTours.Add(x);
+                    //Console.Clear();
+                    //for (int j = 0; j < x.points.Count; j++)
+                    //{
+                    //    Console.Write(x.points[j].ToString());
+                    //}
+                    //Console.WriteLine();
+                    //bestTours.Add(x);
+
+                    chart1.Series[0].Points.AddY(tsp.CalculateFunction(x));
                     accepted++;
                 }
                 else
@@ -60,7 +78,7 @@ namespace optimization
                             break;
 
                     case -1:
-                            if (rejQuasInRaw + 1 == exitConst)
+                        if (rejQuasInRaw + 1 == exitConst)
                             {
                                 finished = true;
                                 break;
@@ -89,7 +107,7 @@ namespace optimization
 
         private int QuasiEquilibriumReached(long acceptedCounter, long rejectedCounter)
         {
-            double nEps = 1;//(tsp.points.Count * (tsp.points.Count - 1)) / 2;
+            double nEps = (int)((tsp.points.Count * (tsp.points.Count - 1)) / 2);
             if (acceptedCounter == nEps)
             {
                 return 1;

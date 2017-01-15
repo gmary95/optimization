@@ -6,10 +6,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace optimization
 {
@@ -43,26 +45,41 @@ namespace optimization
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBox1.Text == "Hill Climbing")
+            if (comboBox1.Text == "Hill Climbing(best)")
             {
+                label2.Visible = false;
                 label6.Visible = false;
                 label7.Visible = false;
+                numericUpDown1.Visible = false;
+                numericUpDown4.Visible = false;
+                textBox1.Visible = false;
+            }
+            if (comboBox1.Text == "Hill Climbing(first)")
+            {
+                label2.Visible = true;
+                label6.Visible = false;
+                label7.Visible = false;
+                numericUpDown1.Visible = true;
                 numericUpDown4.Visible = false;
                 textBox1.Visible = false;
             }
             if (comboBox1.Text == "Simulated Annealing")
             {
+                label2.Visible = true;
                 label6.Visible = true;
                 label7.Visible = true;
                 label7.Text = "Number For Exit";
+                numericUpDown1.Visible = true;
                 numericUpDown4.Visible = true;
                 textBox1.Visible = true;
             }
             if (comboBox1.Text == "Genetic Algorithm")
             {
+                label2.Visible = true;
                 label6.Visible = false;
                 label7.Visible = true;
                 label7.Text = "Population Size";
+                numericUpDown1.Visible = true;
                 numericUpDown4.Visible = true;
                 textBox1.Visible = false;
 
@@ -93,7 +110,6 @@ namespace optimization
                     dataGridView1.Rows[i].Cells[j].Value = tsp.distanceMatrix[i, j];
                 }
             }
-            //ThreadPool.QueueUserWorkItem(new WaitCallback(BeginTsp));
             BeginTsp(null);
         }
 
@@ -101,16 +117,29 @@ namespace optimization
         {
             sameAnswer = new List<Tour>();
             comboBox2.Items.Clear();
-            if (comboBox1.Text == "Hill Climbing")
+            if (comboBox1.Text == "Hill Climbing(best)")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts);
-                Tour transposition = hc.Calculate();
+                Tour transposition = hc.CalculateBest();
                 sameAnswer = hc.bestTours;
-                richTextBox1.Text += "Hill climbing solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
+                richTextBox1.Text += "Hill climbing(best) solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
+                stopwatch.Stop();
+                label5.Text = stopwatch.ElapsedMilliseconds.ToString();
+            }
+            if (comboBox1.Text == "Hill Climbing(first)")
+            {
+                int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                HillClimbingCalculator hc = new HillClimbingCalculator(tsp, numberOfAttempts);
+                Tour transposition = hc.CalculateFirst();
+                sameAnswer = hc.bestTours;
+                richTextBox1.Text += "Hill climbing(first) solution: " + tsp.CalculateFunction(transposition).ToString() + "\n";
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
             }
@@ -140,14 +169,14 @@ namespace optimization
                 Tour bestTour = pop.GetFittest();
                 double fitness = tsp.CalculateFunction(bestTour);
                 richTextBox1.Text += "Genetic algorithm solution:\nInitial distance: " + fitness + "\n";
-                sameAnswer.Add(pop.GetFittest());
+                //sameAnswer.Add(pop.GetFittest());
                 GA genetic = new GA(tsp);
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
-                    pop = genetic.EvolvePopulation(pop);
-                    bestTour = pop.GetFittest();
-                    sameAnswer.Add(bestTour);
-                    richTextBox1.Text += "y = " + tsp.CalculateFunction(bestTour) + "\n";
+                    genetic.EvolvePopulation(pop);
+                    //bestTour = pop.GetFittest();
+                    //sameAnswer.Add(bestTour);
+                    //richTextBox1.Text += "y = " + tsp.CalculateFunction(bestTour) + "\n";
                 }
                 richTextBox1.Text += "Final distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
                 tsp.Draw(pop.GetFittest());
@@ -275,7 +304,7 @@ namespace optimization
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             tsp.Draw(sameAnswer[comboBox2.SelectedIndex]);
-            label8.Text = tsp.CalculateFunction(sameAnswer[comboBox2.SelectedIndex]).ToString();
+            label8.Text = Math.Round(tsp.CalculateFunction(sameAnswer[comboBox2.SelectedIndex]), 6).ToString();
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -299,6 +328,38 @@ namespace optimization
         private void numericUpDown4_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //if (tabControl1.SelectedIndex == 1)
+            //{
+            //    if (sameAnswer != null)
+            //    {
+            //        chart1.Series[0].Points.Clear();
+            //        chart1.Series[0].ChartType = SeriesChartType.FastLine;
+            //        for (int i = 0; i < sameAnswer.Count; i++)
+            //        {
+            //            chart1.Series[0].Points.AddY(tsp.CalculateFunction(sameAnswer[i]));
+            //        }
+            //    }
+            //}
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            saveFileDialog1.ShowDialog();
+
+            if (saveFileDialog1.FileName != "")
+            {
+                List<string> linesToWrite = new List<string>();
+                for (int colIndex = 0; colIndex < city.Count; colIndex++)
+                {
+                    linesToWrite.Add((colIndex+1).ToString() + " " + city[colIndex].x.ToString() + " " + city[colIndex].y.ToString());
+                }
+
+                File.WriteAllLines(saveFileDialog1.FileName, linesToWrite.ToArray());
+            }
         }
     }
 }

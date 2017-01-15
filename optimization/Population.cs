@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static optimization.GA;
 
 namespace optimization
 {
@@ -29,18 +30,45 @@ namespace optimization
         {
             return tours[index];
         }
+        public LehaPairTour GetFittestLeha()
+        {
+            SortFittest();
+
+            return new LehaPairTour(tours[0], tours[1]);
+        }
 
         public Tour GetFittest()
         {
-            Tour fittest = tours[0];
+            SortFittest();
+
+            return tours[0];
+        }
+
+        public void SortFittest()
+        {
+            Array.Sort(tours, (x, y) =>
+            {
+                double d = (tsp.CalculateFunction(x) - tsp.CalculateFunction(y));
+                return d < 0 ? -1 : d == 0 ? 0 : 1;
+            });
+        }
+
+        public void ReplaceWorst(Tour tour)
+        {
+            Tour worst = tours[0];
+            int index = 0;
             for (int i = 1; i < PopulationSize(); i++)
             {
-                if (tsp.CalculateFunction(fittest) >= tsp.CalculateFunction(GetTour(i)))
+                if (tsp.CalculateFunction(worst) <= tsp.CalculateFunction(GetTour(i)))
                 {
-                    fittest = GetTour(i);
+                    worst = GetTour(i);
+                    index = i;
                 }
             }
-            return fittest;
+            if (tsp.CalculateFunction(worst) >= tsp.CalculateFunction(tour))
+            {
+                tours[index] = tour;
+            }
         }
 
         public int PopulationSize()

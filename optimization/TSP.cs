@@ -22,7 +22,7 @@ namespace optimization
             {
                 for (int j = 0; j < points.Count; j++)
                 {
-                    distanceMatrix[i,j] = Math.Sqrt(Math.Pow(points[i].x - points[j].x, 2) * Math.Pow(points[i].y - points[j].y, 2));
+                    distanceMatrix[i,j] = Math.Sqrt(Math.Pow(points[i].x - points[j].x, 2) + Math.Pow(points[i].y - points[j].y, 2));
                 }
             }
         }
