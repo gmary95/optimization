@@ -117,6 +117,10 @@ namespace optimization
         {
             sameAnswer = new List<Tour>();
             comboBox2.Items.Clear();
+            chart1.Series.Clear();
+            chart1.Series.Add("line");
+            chart1.Series[0].ChartType = SeriesChartType.FastLine;
+            chart1.Series[0].IsVisibleInLegend = false;
             if (comboBox1.Text == "Hill Climbing(best)")
             {
                 int numberOfAttempts = Convert.ToInt32(numericUpDown1.Value);
@@ -166,20 +170,23 @@ namespace optimization
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Population pop = new Population(tsp, populationSize, true);
-                Tour bestTour = pop.GetFittest();
-                double fitness = tsp.CalculateFunction(bestTour);
+                PopulationAndFitness bestTour = pop.GetFittest();
+                double fitness = bestTour.fitness;
+                //chart1.Series.Add("worst");
+                //chart1.Series[1].ChartType = SeriesChartType.FastLine;
                 richTextBox1.Text += "Genetic algorithm solution:\nInitial distance: " + fitness + "\n";
                 //sameAnswer.Add(pop.GetFittest());
-                GA genetic = new GA(tsp);
+                GA genetic = new GA(tsp, pop);
                 for (int i = 0; i < numberOfAttempts; i++)
                 {
-                    genetic.EvolvePopulation(pop);
+                    genetic.population = pop;
+                    genetic.EvolvePopulation();
                     //bestTour = pop.GetFittest();
                     //sameAnswer.Add(bestTour);
-                    //richTextBox1.Text += "y = " + tsp.CalculateFunction(bestTour) + "\n";
+                    //richTextBox1.Text += "y = " + bestTour.fitness + "\n";
                 }
-                richTextBox1.Text += "Final distance: " + tsp.CalculateFunction(pop.GetFittest()) + "\n";
-                tsp.Draw(pop.GetFittest());
+                richTextBox1.Text += "Final distance: " + pop.GetFittest().fitness + "\n";
+                tsp.Draw(pop.GetFittest().tour);
                 stopwatch.Stop();
                 label5.Text = stopwatch.ElapsedMilliseconds.ToString();
             }

@@ -10,37 +10,36 @@ namespace optimization
     class Population
     {
         TSP tsp;
-        public Tour[] tours;
+        public PopulationAndFitness[] tours;
 
         public Population(TSP tsp, int populationSize, bool initialise)
         {
             this.tsp = tsp;
-            tours = new Tour[populationSize];
+            tours = new PopulationAndFitness[populationSize];
             if (initialise)
             {
                 for (int i = 0; i < PopulationSize(); i++)
                 {
                     Tour newTour = new Tour(tsp.points.Count);
-                    tours[i] = newTour;
+                    tours[i] = new PopulationAndFitness(tsp, newTour);
                 }
             }
         }
 
-        public Tour GetTour(int index)
+        public PopulationAndFitness GetTour(int index)
         {
             return tours[index];
         }
-        public LehaPairTour GetFittestLeha()
+        public ParentPairTour GetFittestLeha()
         {
             SortFittest();
 
-            return new LehaPairTour(tours[0], tours[1]);
+            return new ParentPairTour(tours[0], tours[1]);
         }
 
-        public Tour GetFittest()
+        public PopulationAndFitness GetFittest()
         {
             SortFittest();
-
             return tours[0];
         }
 
@@ -48,26 +47,17 @@ namespace optimization
         {
             Array.Sort(tours, (x, y) =>
             {
-                double d = (tsp.CalculateFunction(x) - tsp.CalculateFunction(y));
+                double d = (x.fitness - y.fitness);
                 return d < 0 ? -1 : d == 0 ? 0 : 1;
             });
         }
 
-        public void ReplaceWorst(Tour tour)
+        public void ReplaceWorst(PopulationAndFitness tour)
         {
-            Tour worst = tours[0];
-            int index = 0;
-            for (int i = 1; i < PopulationSize(); i++)
+            SortFittest();
+            if (tours[tours.Length - 1].fitness >= tour.fitness)
             {
-                if (tsp.CalculateFunction(worst) <= tsp.CalculateFunction(GetTour(i)))
-                {
-                    worst = GetTour(i);
-                    index = i;
-                }
-            }
-            if (tsp.CalculateFunction(worst) >= tsp.CalculateFunction(tour))
-            {
-                tours[index] = tour;
+                tours[tours.Length - 1] = tour;
             }
         }
 

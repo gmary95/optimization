@@ -55,9 +55,6 @@ namespace optimization
         {
             Form1 form = (Form1)Application.OpenForms[0];
             Chart chart1 = form.chart1;
-            chart1.Series.Clear();
-            chart1.Series.Add("line");
-            chart1.Series[0].ChartType = SeriesChartType.FastLine;
             Tour x = new Tour(tsp.points.Count);
             //bestTours.Add(x);
             bool isFound = false;

@@ -8,8 +8,6 @@ namespace optimization
 {
     class City
     {
-        Random random = new Random();
-
         public double x { get; }
         public double y { get; }
 
@@ -17,12 +15,6 @@ namespace optimization
         {
             this.x = x;
             this.y = y;
-        }
-
-        public City()
-        {
-            this.x = (random.NextDouble() * 200);
-            this.y = (random.NextDouble() * 200);
         }
 
         public string toString()

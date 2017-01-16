@@ -8,52 +8,76 @@ namespace optimization
 {
     class GA
     {
+        public class LehaPair
+        {
+            public int x;
+            public int y;
+            public LehaPair(int x, int y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        public class ParentPairTour
+        {
+            public PopulationAndFitness x;
+            public PopulationAndFitness y;
+            public ParentPairTour(PopulationAndFitness x, PopulationAndFitness y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+
         private double mutationRate = 0.3;
         private int tournamentSize = 4;
 
         TSP tsp;
         static Random random = new Random();
         List<int> rankMap;
+        public Population population;
 
-        public GA(TSP tsp)
+        public GA(TSP tsp, Population population)
         {
             this.tsp = tsp;
+            this.population = population;
+            this.rankMap = new List<int>(population.PopulationSize());
         }
 
-        public void EvolvePopulation(Population population)
+        public void EvolvePopulation()
         {
-            this.rankMap = new List<int>(population.PopulationSize());
             int sumOfRank = CalcSumOfRank(population.PopulationSize());
-            LehaPairTour parent = parentSelection(population, sumOfRank);
+            ParentPairTour parent = parentSelection(population, sumOfRank);
             Tour child = Crossover(parent.x, parent.y);
             Mutate(child);
-            population.ReplaceWorst(child);
+            population.ReplaceWorst(new PopulationAndFitness(tsp, child));
         }
 
-        public Tour Crossover(Tour parent1, Tour parent2)
+        public Tour Crossover(PopulationAndFitness parent1, PopulationAndFitness parent2)
         {
             Tour child = new Tour(tsp.points.Count, -1);
 
 
-            Dictionary<int, NeighboardCityes> cities = createEdgeRecombinationMatrix(parent1, parent2);
+            Dictionary<int, NeighboardCityes> cities = createEdgeRecombinationMatrix(parent1.tour, parent2.tour);
             child.points[0] = (cities.Keys.Select(x => new LehaPair(x, cities[x].neignboardCity.Count)).OrderBy(x => x.y).ToList())[0].x;
 
-            for (int i = 1; i < parent1.points.Count; i++)
+            for (int i = 1; i < parent1.tour.points.Count; i++)
             {
-                List<int> neighboards = cities[child.points[i - 1]].FindNextCity();
                 int xBB;
-                try
+                if (cities[child.points[i - 1]].neignboardCity.Count != 0)
                 {
-                    List<int> xEE =
-                        neighboards
+                    List<int> neighboards = cities[child.points[i - 1]].FindNextCity();
+                    List<int> xEE = neighboards
                         .GroupBy(x => cities[x].neignboardCity.Count)
                         .OrderBy(x => x.Key)
                         .ToList()[0]
                         .ToList();
 
-                     xBB = xEE[random.Next(xEE.Count)];
+                    xBB = xEE[random.Next(xEE.Count)];
                 }
-                catch (Exception)
+                else
                 {
                     xBB = cities[child.points[i - 1]].RandomNodeNotInChild(child);
                 }
@@ -68,28 +92,6 @@ namespace optimization
             return child;
         }
 
-        public class LehaPair
-        {
-            public int x;
-            public int y;
-            public LehaPair(int x, int y)
-            {
-                this.x = x;
-                this.y = y;
-            }
-        }
-
-        public class LehaPairTour
-        {
-            public Tour x;
-            public Tour y;
-            public LehaPairTour(Tour x, Tour y)
-            {
-                this.x = x;
-                this.y = y;
-            }
-        }
-
         private void Mutate(Tour tour)
         {
             if (random.NextDouble() < mutationRate)
@@ -98,7 +100,7 @@ namespace optimization
             }
         }
 
-        private LehaPairTour TournamentSelection(TSP tsp, Population population)
+        private ParentPairTour TournamentSelection(TSP tsp, Population population)
         {
             Population tournament = new Population(tsp, tournamentSize, false);
             for (int i = 0; i < tournamentSize; i++)
@@ -109,18 +111,18 @@ namespace optimization
            
             return tournament.GetFittestLeha();
         }
-        private LehaPairTour parentSelection(Population population, int sumOfRank)
+        private ParentPairTour parentSelection(Population population, int sumOfRank)
         {
 
-            List<Tour> sortedTour = population.tours.OrderBy(x => tsp.CalculateFunction(x)).ToList();
+            List<PopulationAndFitness> sortedTour = population.tours.OrderBy(x => x.fitness).ToList();
 
             int topIndex1 = getTopIndex(sumOfRank);
             int topIndex2 = getTopIndex(sumOfRank, topIndex1);
 
-            Tour first = population.GetTour(topIndex1);
-            Tour second = population.GetTour(topIndex2);
+            PopulationAndFitness first = population.GetTour(topIndex1);
+            PopulationAndFitness second = population.GetTour(topIndex2);
 
-            return new LehaPairTour(first, second);
+            return new ParentPairTour(first, second);
         }
         private int getTopIndex(int sumOfRank, int disallowedIndex)
         {
@@ -242,7 +244,7 @@ namespace optimization
                         }
                         else
                         {
-                            edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i + 1], edgeRecombinationMatrix[parent2.points[i]].isContains(parent2.points[i + 1])));
+                            edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i + 1], false));
 
                         }
                     }
@@ -255,7 +257,7 @@ namespace optimization
                         }
                         else
                         {
-                            edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i - 1], edgeRecombinationMatrix[parent2.points[i]].isContains(parent2.points[i - 1])));
+                            edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i - 1], false));
                         }
                         if (edgeRecombinationMatrix[parent2.points[i]].isContains(parent2.points[i + 1]))
                         {
@@ -263,7 +265,7 @@ namespace optimization
                         }
                         else
                         {
-                            edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i + 1], edgeRecombinationMatrix[parent2.points[i]].isContains(parent2.points[i + 1])));
+                            edgeRecombinationMatrix[parent2.points[i]].neignboardCity.Add(new NeighboardCity(parent2.points[i + 1], false));
 
                         }
                     }

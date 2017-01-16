@@ -63,6 +63,7 @@
     <Compile Include="NeighboardCity.cs" />
     <Compile Include="NeighboardCityes.cs" />
     <Compile Include="Population.cs" />
+    <Compile Include="PopulationAndFitness.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimulatedAnnealing.cs" />
